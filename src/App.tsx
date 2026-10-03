@@ -205,7 +205,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f3fcf2] text-[#161d18] flex flex-col antialiased">
       {/* Show Standard Palengke Header on tabs other than full-screen Live broadcast */}
-      {activeTab !== 'live-latag' && (
+      {activeTab === 'home' && (
         <Header
           onOpenCart={() => setIsCartOpen(true)}
           cartCount={totalCartCount}
@@ -222,7 +222,9 @@ export default function App() {
       {/* Main Content Area */}
       <main
         className={`flex-1 w-full ${
-          activeTab !== 'live-latag' ? 'pt-28' : 'pt-0'
+         ( activeTab === 'live-latag' || activeTab === 'profile-tinderas'
+          || activeTab === 'suki-listahan' || activeTab === 'orders'
+         )? 'pt-10' : 'pt-28'
         }`}
       >
         {activeTab === 'home' && (
