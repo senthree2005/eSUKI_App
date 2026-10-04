@@ -103,7 +103,11 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onSuccessLogin, onExplor
   return (
     <div className="min-h-full flex flex-col justify-between items-center py-6 px-4 max-w-md mx-auto relative select-none">
       {/* Top spacing to match vertical rhythm of mobile screen */}
-      <div className="w-full flex justify-end items-center mb-2">
+      <div className="w-full flex justify-between items-center mb-2">
+        <div className="flex items-center">
+          <img src="/src/img/logo1.png" className="w-10 h-10" />
+          <h1 className="font-extrabold font-sans text-[20px] mt-3"><span className='text-[#ff832d]'>e</span>Suki</h1>
+        </div>
         <button
           onClick={onExploreAsGuest}
           className="text-xs font-semibold text-[#004328] bg-[#eaf4ed] hover:bg-[#d8edd9] px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 shadow-2xs"

@@ -30,9 +30,9 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="fixed top-0 w-full z-40 pt-safe bg-[#f3fcf2]/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#e2ebe1]">
       <div className="h-28 px-4 flex flex-col justify-center gap-1.5 max-w-lg mx-auto">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-1.5">
           <div className="flex items-center gap-2">
-            <img src="/src/img/logo1.png" className="h-[40px] w-[40px]" alt="" />
+            <img src="/src/img/logo1.png" className="h-[35px] w-[35px]" alt="" />
             <div className="flex flex-col relative">
               {/* <span className="text-[10px] font-extrabold text-[#7d5800] tracking-wider">
                 

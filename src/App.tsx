@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { act, useState } from 'react';
 import { Product, LiveVendor, CartItem, Order, SukiCustomer } from './types';
 import {
   INITIAL_PRODUCTS,
@@ -20,10 +20,13 @@ import { LiveBroadcastScreen } from './components/LiveBroadcastScreen';
 import { TinderaHubScreen } from './components/TinderaHubScreen';
 import { OrdersScreen } from './components/OrdersScreen';
 import { SukiListahanScreen } from './components/SukiListahanScreen';
+import { AuthScreen } from './components/Authentication';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<string>('home');
-  const [previousTab, setPreviousTab] = useState<string>('home');
+  // const [activeTab, setActiveTab] = useState<string>('home');
+  // const [previousTab, setPreviousTab] = useState<string>('home');
+  const [activeTab, setActiveTab] = useState<string>('auth');
+  const [previousTab, setPreviousTab] = useState<string>('auth');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Core App Data Stores
@@ -34,6 +37,16 @@ export default function App() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
   const [sukiCustomers, setSukiCustomers] = useState<SukiCustomer[]>(INITIAL_SUKI_CUSTOMERS);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ name: string; phone: string; method: string } | null>(null);
+
+
+
+  const handleSuccessLogin = (user: { name: string; phone: string; method: string }) => {
+    setIsLoggedIn(true);
+    setCurrentUser(user);
+    setActiveTab('home');
+  };
 
   // Cart operations
   const handleAddToCart = (product: Product, quantity = 1, note = '') => {
@@ -223,8 +236,8 @@ export default function App() {
       <main
         className={`flex-1 w-full ${
          ( activeTab === 'live-latag' || activeTab === 'profile-tinderas'
-          || activeTab === 'suki-listahan' || activeTab === 'orders'
-         )? 'pt-10' : 'pt-28'
+          || activeTab === 'suki-listahan' || activeTab === 'orders' || activeTab ==='auth'
+         )? 'pt-5' : 'pt-28'
         }`}
       >
         {activeTab === 'home' && (
@@ -237,6 +250,14 @@ export default function App() {
             searchQuery={searchQuery}
           />
         )}
+
+        {activeTab === 'auth' && (
+          <AuthScreen
+                  onSuccessLogin={handleSuccessLogin}
+                  onExploreAsGuest={() => setActiveTab('home')}
+          />
+        )
+        }
 
         {activeTab === 'live-latag' && (
           <LiveBroadcastScreen
@@ -289,7 +310,7 @@ export default function App() {
       </main>
 
       {/* Persistent Bottom Tab Bar (shown on home, orders, listahan, tinderas) */}
-      {activeTab !== 'live-latag' && (
+      {(activeTab !== 'live-latag' && activeTab !== 'auth') && (
         <BottomNav
           activeTab={activeTab}
           onSelectTab={(tab) => {
