@@ -92,3 +92,101 @@ export interface SukiCustomer {
   lastOrdered: string;
   notes: string;
 }
+
+
+// ACCOUNT USER TYPES
+
+
+export interface UserProfile {
+  name: string;
+  location: string;
+  avatarUrl: string;
+  orderCount: number;
+  sukiPoints: number;
+  favoriteVendorsCount: number;
+}
+
+export interface BasketItem {
+  id: string;
+  name: string;
+  vendorName: string;
+  stallNumber: string;
+  category: string;
+  price: number;
+  unit: string;
+  quantity: number;
+  packed: boolean;
+  thumbnailUrl: string;
+}
+
+export interface DeliveryRider {
+  name: string;
+  todaAssociation: string;
+  tricycleNumber: string;
+  avatarUrl: string;
+  estimatedDeliveryMins: number;
+  currentLocationName: string;
+  phone: string;
+  rating: number;
+  plateNumber: string;
+}
+
+export interface CurrentDelivery {
+  basketId: string;
+  status: 'Preparing' | 'Packed' | 'On The Way' | 'Delivered';
+  totalPrice: number;
+  stallsCount: number;
+  items: BasketItem[];
+  rider: DeliveryRider;
+}
+
+export interface Vendor {
+  id: string;
+  name: string;
+  stallNumber: string;
+  marketSection: string;
+  sukiDuration: string;
+  rating: number;
+  sukiCount: number;
+  isLive: boolean;
+  liveTitle?: string;
+  isOpen: boolean;
+  statusText: string;
+  avatarUrl: string;
+  category: 'Seafood' | 'Vegetables' | 'Street Food' | 'Fruits' | 'Rice' | 'Coffee & Spices';
+  actionType: 'watch_live' | 'order' | 'alert_me';
+  specialty: string;
+  description: string;
+  products?: {
+    id: string;
+    name: string;
+    price: number;
+    unit: string;
+    availableKg?: number;
+    freshness: string;
+  }[];
+}
+
+export interface SukiRecord {
+  vendorId: string;
+  vendorName: string;
+  stallNumber: string;
+  tier: 'Bronze' | 'Silver' | 'Gold' | 'Gold Suki' | 'Silver Suki' | 'VIP Suki';
+  durationYears: number;
+  totalSpent: number;
+  perksUnlocked: string[];
+  activePrivilege: string;
+  stampsCount: number;
+  nextReward: string;
+  sukiNotes: string;
+  lastOrderDate: string;
+}
+
+export interface LiveComment {
+  id: string;
+  sender: string;
+  message: string;
+  isSuki: boolean;
+  timestamp: string;
+  isMineAction?: boolean;
+}

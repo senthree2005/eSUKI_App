@@ -21,6 +21,7 @@ import { TinderaHubScreen } from './components/TinderaHubScreen';
 import { OrdersScreen } from './components/OrdersScreen';
 import { SukiListahanScreen } from './components/SukiListahanScreen';
 import { AuthScreen } from './components/Authentication';
+import  {AccountUser}  from './components/user_page/AccountUser'
 
 export default function App() {
   // const [activeTab, setActiveTab] = useState<string>('home');
@@ -236,7 +237,8 @@ export default function App() {
       <main
         className={`flex-1 w-full ${
          ( activeTab === 'live-latag' || activeTab === 'profile-tinderas'
-          || activeTab === 'suki-listahan' || activeTab === 'orders' || activeTab ==='auth'
+          || activeTab === 'suki-listahan' || activeTab === 'orders' 
+          || activeTab ==='auth' || activeTab === 'account'
          )? 'pt-5' : 'pt-28'
         }`}
       >
@@ -268,6 +270,18 @@ export default function App() {
             }}
             onQuickOrder={handleLiveQuickOrder}
             onAddToCart={handleAddToCart}
+          />
+        )}
+
+        {activeTab === 'account' && (
+          <AccountUser
+            onSelectTab={(tab) =>{
+              setPreviousTab(activeTab);
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            }
           />
         )}
 
@@ -310,7 +324,7 @@ export default function App() {
       </main>
 
       {/* Persistent Bottom Tab Bar (shown on home, orders, listahan, tinderas) */}
-      {(activeTab !== 'live-latag' && activeTab !== 'auth') && (
+      {(activeTab !== 'live-latag' && activeTab !== 'auth' && activeTab !== 'account') && (
         <BottomNav
           activeTab={activeTab}
           onSelectTab={(tab) => {

@@ -105,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Tindera Hub Shortcut Avatar */}
             <button
-              onClick={() => onSelectTab('profile-tinderas')}
+              onClick={() => onSelectTab('account')}
               title="Ate Lorna Tindera Mode"
               className="w-8 h-8 rounded-full bg-[#004328] flex items-center justify-center text-white ring-2 ring-[#a9f3c5] hover:opacity-90 transition-opacity"
             >
