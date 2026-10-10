@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, BookOpen, Award, CheckCircle, Sparkles, Plus, Edit2, Shield } from 'lucide-react';
-import { SukiRecord } from '../types';
+import { SukiRecord } from '../../types';
 
 interface SukiLedgerModalProps {
   records: SukiRecord[];

@@ -7,16 +7,27 @@ export interface Product {
   price: number;
   originalPrice?: number;
   unit: string;
-  stall: string;
-  vendorName: string;
-  vendorId: string;
+  quantity: number;
+  minQuantity: number;
+  step: number;
+  vendor: Vendor;
   image: string;
   stockState: StockState;
+  subtitle: string,
+  unitText: string,
   stockRemaining?: string;
   isLiveSpecial?: boolean;
   category: string;
   tag?: string;
   description?: string;
+  reviewCount: number;
+  reviews?: Review[];
+  heroImage?: string;
+  thumbnails: {
+      id: string;
+      url: string;
+      label: string;
+    }[];
 }
 
 export interface LiveVendor {
@@ -104,6 +115,7 @@ export interface UserProfile {
   orderCount: number;
   sukiPoints: number;
   favoriteVendorsCount: number;
+  vendor: Vendor;
 }
 
 export interface BasketItem {
@@ -149,6 +161,10 @@ export interface Vendor {
   rating: number;
   sukiCount: number;
   isLive: boolean;
+  location: string,
+  vendorName: string;
+  vendorId: string;
+  vendorAvatar: string;
   liveTitle?: string;
   isOpen: boolean;
   statusText: string;
@@ -189,4 +205,44 @@ export interface LiveComment {
   isSuki: boolean;
   timestamp: string;
   isMineAction?: boolean;
+}
+
+
+// ITEM DETAILS
+
+export interface Review {
+  id: string;
+  author: string;
+  tier?: string;
+  location: string;
+  timestamp: string;
+  rating: number;
+  comment: string;
+  prepTag?: string;
+  verifiedSuki: boolean;
+  avatarColor: string;
+  initials: string;
+}
+
+export interface BasketItem {
+  id: string;
+  productId: string;
+  productName: string;
+  pricePerKilo: number;
+  weightKg: number;
+  selectedCut: string;
+  specialInstructions: string;
+  image: string;
+  stallName: string;
+}
+
+export interface SukiRecord {
+  id: string;
+  date: string;
+  stall: string;
+  items: string;
+  amount: number;
+  pointsEarned: number;
+  status: 'Delivered' | 'In Transit' | 'Preparing';
+  paidVia: 'GCash' | 'Kaliwaan (COD)' | 'Suki Credit';
 }

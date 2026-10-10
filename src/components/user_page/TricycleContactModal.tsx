@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Phone, MessageSquare, Send, Bike, Check } from 'lucide-react';
-import { DeliveryRider } from '../types';
+import { DeliveryRider } from '../../types';
 
 interface TricycleContactModalProps {
   rider: DeliveryRider;

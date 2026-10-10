@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Heart, Video, MessageSquare, Store, Bell, Clock, Star } from 'lucide-react';
-import { Vendor } from '../types';
+import { Vendor } from '../../types';
 
 interface FavoriteVendorsSectionProps {
   vendors: Vendor[];

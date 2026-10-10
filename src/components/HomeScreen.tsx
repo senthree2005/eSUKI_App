@@ -403,11 +403,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                         price: vendor.minPrice,
                         unit: 'order',
                         stall: vendor.location,
-                        vendorName: vendor.name,
+                        vendor: vendor,
                         vendorId: vendor.id,
                         image: vendor.image,
                         stockState: 'in',
                         category: 'Street Food',
+                        reviewCount: 0
                       };
                       handleAddSukiWithFeedback(sfProduct);
                     }}

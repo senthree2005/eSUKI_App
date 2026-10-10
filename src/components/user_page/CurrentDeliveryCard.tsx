@@ -1,6 +1,6 @@
 import React from 'react';
 import { Check, Compass, Phone, Bike, Navigation } from 'lucide-react';
-import { CurrentDelivery } from '../types';
+import { CurrentDelivery } from '../../types';
 
 interface CurrentDeliveryCardProps {
   delivery: CurrentDelivery;

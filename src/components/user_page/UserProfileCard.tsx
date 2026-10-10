@@ -1,6 +1,6 @@
 import React from 'react';
 import { MapPin, Receipt, BookOpen, Heart } from 'lucide-react';
-import { UserProfile } from '../types';
+import { UserProfile } from '../../types';
 
 interface UserProfileCardProps {
   user: UserProfile;

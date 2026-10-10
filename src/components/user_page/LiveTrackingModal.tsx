@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Navigation, Phone, MessageSquare, Bike, CheckCircle2, Clock, MapPin } from 'lucide-react';
-import { DeliveryRider, BasketItem } from '../types';
+import { DeliveryRider, BasketItem } from '../../types';
 
 interface LiveTrackingModalProps {
   rider: DeliveryRider;

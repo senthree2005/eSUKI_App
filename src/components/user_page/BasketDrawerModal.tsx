@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Trash2, ShoppingBag, Bike, Gift, ArrowRight, ShieldCheck } from 'lucide-react';
-import { BasketItem } from '../types';
+import { BasketItem } from '../../types';
 
 interface BasketDrawerModalProps {
   items: BasketItem[];

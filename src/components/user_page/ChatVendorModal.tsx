@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Send, Store, Sparkles } from 'lucide-react';
-import { Vendor } from '../types';
+import { Vendor } from '../../types';
 
 interface ChatVendorModalProps {
   vendor: Vendor;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Receipt, CheckCircle2, Clock, ChevronRight, Repeat, ArrowRight } from 'lucide-react';
-import { CurrentDelivery } from '../types';
+import { CurrentDelivery } from '../../types';
 
 interface MyOrdersModalProps {
   currentDelivery: CurrentDelivery;

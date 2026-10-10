@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, Minus, ShoppingBag, Check, Sparkles } from 'lucide-react';
-import { Vendor } from '../types';
+import { Vendor } from '../../types';
 
 interface OrderStallModalProps {
   vendor: Vendor;
