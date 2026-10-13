@@ -26,13 +26,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const categories = [
     { id: 'Street Food', label: 'Street Food', icon: 'kebab_dining', color: 'bg-[#ffdea9]/50 text-[#7d5800]' },
-    { id: 'Fresh Gulay', label: 'Fresh Gulay', icon: 'nutrition', color: 'bg-[#a9f3c5]/40 text-[#004328]' },
-    { id: 'Isda & Latag', label: 'Isda & Latag', icon: 'set_meal', color: 'bg-[#8ed6aa]/40 text-[#0d5c3a]' },
+    { id: 'Vegetables', label: 'Vegetables', icon: 'nutrition', color: 'bg-[#a9f3c5]/40 text-[#004328]' },
+    { id: 'Seafood', label: 'Seafood', icon: 'set_meal', color: 'bg-[#8ed6aa]/40 text-[#0d5c3a]' },
     { id: 'Inihaw BBQ', label: 'Inihaw BBQ', icon: 'outdoor_grill', color: 'bg-[#ffdbd2]/60 text-[#711700]' },
     { id: 'Kakanin', label: 'Kakanin', icon: 'bakery_dining', color: 'bg-[#ffdea9]/50 text-[#7d5800]' },
-    { id: 'Prutas', label: 'Prutas', icon: 'eco', color: 'bg-[#a9f3c5]/40 text-[#004328]' },
-    { id: 'Pampalamig', label: 'Pampalamig', icon: 'local_cafe', color: 'bg-[#ffdea9]/60 text-[#6d4c00]' },
-    { id: 'Lutong Bahay', label: 'Lutong Bahay', icon: 'dinner_dining', color: 'bg-[#dce5db] text-[#404942]' },
+    { id: 'Fruits', label: 'Fruits', icon: 'eco', color: 'bg-[#a9f3c5]/40 text-[#004328]' },
+    { id: 'Drinks', label: 'Drinks', icon: 'local_cafe', color: 'bg-[#ffdea9]/60 text-[#6d4c00]' },
+    { id: 'Homemade', label: 'Homemade', icon: 'dinner_dining', color: 'bg-[#dce5db] text-[#404942]' },
   ];
 
   const handleAddSukiWithFeedback = (product: Product) => {
@@ -188,52 +188,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </section>
 
-      {/* Palengke Category Grid (8 Categories) */}
-      <section className="px-4 flex flex-col space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold text-[16px] text-[#161d18]">Categories</h3>
-          <button
-            onClick={() => setSelectedCategory('All')}
-            className={`text-[11px] font-bold transition-colors ${
-              selectedCategory === 'All' ? 'text-[#004328] underline' : 'text-[#7d5800]'
-            }`}
-          >
-            Lahat ng Tinda
-          </button>
-        </div>
-
-        <div className="grid grid-cols-4 gap-2">
-          {categories.map((cat) => {
-            const isSelected = selectedCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() =>
-                  setSelectedCategory(selectedCategory === cat.id ? 'All' : cat.id)
-                }
-                className={`flex flex-col items-center p-2 rounded-xl transition-all active:scale-95 text-center border ${
-                  isSelected
-                    ? 'bg-white border-[#004328] shadow-sm'
-                    : 'bg-[#edf6ec] border-transparent hover:bg-[#e8f0e7]'
-                }`}
-              >
-                <div
-                  className={`w-11 h-11 rounded-full flex items-center justify-center mb-1 transition-transform ${cat.color} ${
-                    isSelected ? 'scale-110 ring-2 ring-[#004328]' : ''
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[22px]">
-                    {cat.icon}
-                  </span>
-                </div>
-                <span className="text-[11px] font-bold text-[#161d18] line-clamp-1">
-                  {cat.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      
           {/*Cojkhiinmment*/}
           {/*Comment*/}
       {/* Featured Suki Live Stream Highlight Card */}
@@ -356,6 +311,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </section>
 
+      
+
       {/* Popular Street Food Vendors */}
       <section className="flex flex-col space-y-2">
         <div className="flex items-center justify-between px-4">
@@ -367,7 +324,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
 
         <div className="flex overflow-x-auto no-scrollbar gap-3 px-4 snap-x snap-mandatory">
-          {products.filter((product)=> product.category === 'Street Food')
+          {products.filter((product)=> product.category === selectedCategory || selectedCategory === 'All')
           .map((product) => 
           {
             const vendor = findVendorById(product.vendorID)
@@ -427,12 +384,60 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
       </section>
 
+      {/* Palengke Category Grid (8 Categories) */}
+      <section className="px-4 flex flex-col space-y-2">
+        <div className="flex items-center justify-between">
+          <h3 className="font-bold text-[16px] text-[#161d18]">Categories</h3>
+          <button
+            onClick={() => setSelectedCategory('All')}
+            className={`text-[11px] font-bold transition-colors ${
+              selectedCategory === 'All' ? 'text-[#004328] underline' : 'text-[#7d5800]'
+            }`}
+          >
+            Lahat ng Tinda
+          </button>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2">
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() =>
+                  {
+                    setSelectedCategory(selectedCategory === cat.id ? 'All' : cat.id)
+                  }
+                }
+                className={`flex flex-col items-center p-2 rounded-xl transition-all active:scale-95 text-center border ${
+                  isSelected
+                    ? 'bg-white border-[#004328] shadow-sm'
+                    : 'bg-[#edf6ec] border-transparent hover:bg-[#e8f0e7]'
+                }`}
+              >
+                <div
+                  className={`w-11 h-11 rounded-full flex items-center justify-center mb-1 transition-transform ${cat.color} ${
+                    isSelected ? 'scale-110 ring-2 ring-[#004328]' : ''
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-[22px]">
+                    {cat.icon}
+                  </span>
+                </div>
+                <span className="text-[11px] font-bold text-[#161d18] line-clamp-1">
+                  {cat.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
       {/* Fresh Palengke Vegetables (Latag Today) */}
       <section className="px-4 flex flex-col space-y-2">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-bold text-[16px] text-[#161d18]">Fresh Palengke Vegetables</h3>
-            <p className="text-[11px] text-[#404942]">Bag-ong anihon karong buntag gikan New Corella</p>
+            <h3 className="font-bold text-[16px] text-[#161d18]">{selectedCategory}</h3>
           </div>
           <button className="text-[11px] font-bold text-[#004328] hover:underline">View All</button>
         </div>

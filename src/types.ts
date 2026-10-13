@@ -10,7 +10,10 @@ export type VendorCategory =
   | 'Street Food'
   | 'Fruits'
   | 'Rice'
-  | 'Coffee & Spices';
+  | 'Drinks'
+  | 'Inihaw BBQ'
+  | 'Kakanin'
+  | 'Homemade';
 
 export type VendorActionType = 'watch_live' | 'order' | 'alert_me';
 
@@ -94,7 +97,7 @@ export interface Vendor extends BaseEntity {
 
 export interface Product extends BaseEntity {
   vendorID: string;
-  reviewID: string;
+  reviewID?: string;
   name: string;
   localName?: string;
   price: number;
