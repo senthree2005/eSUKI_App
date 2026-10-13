@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Product, Order, StockState } from '../types';
+import { Product, Order, Driver, Vendor,CartItem } from '../types';
+import { mockCartItems } from '../data/mockDataTest';
 
 interface TinderaHubScreenProps {
   products: Product[];
   orders: Order[];
+  drivers: Driver[];
   onStartLiveStream: () => void;
   onOpenNotebook: () => void;
   onUpdateOrderStatus: (orderId: string, status: Order['status']) => void;
@@ -14,6 +16,7 @@ interface TinderaHubScreenProps {
 export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
   products,
   orders,
+  drivers,
   onStartLiveStream,
   onOpenNotebook,
   onUpdateOrderStatus,
@@ -51,62 +54,82 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
       });
     }, 1800);
   };
+  // const findOrderCartItems = (
+  //     order: Order,
+  //     cartItems: CartItem[]
+  //   ): CartItem[] => {
+  //     return cartItems.filter((item) =>
+  //       order.orders.includes(item.productId)
+  //     );
+  //   };
 
-  const handlePublishVoiceItem = () => {
-    if (!voiceRecognizedItem) return;
+  // const handlePublishVoiceItem = () => {
+  //   if (!voiceRecognizedItem) return;
 
-    const newProd: Product = {
-      id: `prod-voice-${Date.now()}`,
-      name: voiceRecognizedItem.name,
-      localName: 'Presko Bangus',
-      price: voiceRecognizedItem.price,
-      unit: 'kilo',
-      stall: 'Stall #42 Wet Section',
-      vendorName: 'Ate Lorna Seafoods',
-      vendorId: 'vendor-lorna',
-      image:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuCIf_s0R349O4CuhvyKiWRwojRgIKD_iYFfD5M3M62On_A97y8M_VwGOUOugcn663giDxE1Cy-Ex2MA4bjbTkesd2QAyVKEDSFz9DrR8tHsWCS5_rYiO21hZ84GUl1KxSDxiYL8xZIVM4XJRorxf6Q_RrRsvid6jA9hwvXRdMBBv3bi4s4o86xyRobYlknHMR16VzPPNYcfXJ7VaHHnvs3Ih0CzAd6SWHiKxSb8-xHqGMQ63QxRpg1H',
-      stockState: 'in',
-      stockRemaining: '5 kg remaining',
-      category: 'Isda & Latag',
-      tag: 'Voice Added',
-    };
+  //   const newProd: Product = {
+  //     id: `prod-voice-${Date.now()}`,
+  //     name: voiceRecognizedItem.name,
+  //     localName: 'Presko Bangus',
+  //     price: voiceRecognizedItem.price,
+  //     unit: 'kilo',
+  //     stall: 'Stall #42 Wet Section',
+  //     image:
+  //       'https://lh3.googleusercontent.com/aida-public/AB6AXuCIf_s0R349O4CuhvyKiWRwojRgIKD_iYFfD5M3M62On_A97y8M_VwGOUOugcn663giDxE1Cy-Ex2MA4bjbTkesd2QAyVKEDSFz9DrR8tHsWCS5_rYiO21hZ84GUl1KxSDxiYL8xZIVM4XJRorxf6Q_RrRsvid6jA9hwvXRdMBBv3bi4s4o86xyRobYlknHMR16VzPPNYcfXJ7VaHHnvs3Ih0CzAd6SWHiKxSb8-xHqGMQ63QxRpg1H',
+  //     stockState: 'in_stock',
+  //     stockRemaining: '5 kg remaining',
+  //     category: 'Isda & Latag',
+  //     tag: 'Voice Added',
+  //   };
 
-    onAddProduct(newProd);
-    setVoiceRecognizedItem(null);
-    setHandoverToast('Bag-ong tinda nadugang sa Live Latag!');
-    setTimeout(() => setHandoverToast(null), 2500);
-  };
+  //   onAddProduct(newProd);
+  //   setVoiceRecognizedItem(null);
+  //   setHandoverToast('Bag-ong tinda nadugang sa Live Latag!');
+  //   setTimeout(() => setHandoverToast(null), 2500);
+  // };
 
   const handleAddNewManualItem = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newItemName.trim()) return;
+  e.preventDefault();
 
-    const newProd: Product = {
-      id: `prod-manual-${Date.now()}`,
-      name: newItemName.trim(),
-      price: parseFloat(newItemPrice) || 100,
-      unit: newItemUnit,
-      stall: 'Stall #42 Wet Section',
-      vendorName: 'Ate Lorna Seafoods',
-      vendorId: 'vendor-lorna',
-      image:
-        'https://lh3.googleusercontent.com/aida-public/AB6AXuBH3Mep5a4WK5TVh_QaWmTDKNZ6ydSZNwY8uFZuwPyLGHD3byy5HwUkSJAbV8_l5FD4HA6JR0Ewv_lcc2GVT-0jKmyFl4yFrNNDe5HAXaQSXUNevOqNwGr2OaXohmZQq0wL8QubCTiUDFa30S6AM_PkOJzl2qP2ZO7kyFoWwTPP9Eb5Rp36HQtkfqzhvoQl0Gd-PBFnlebsvX2DLi-8WtbZ45NKnmBcQYF17Jf2mrF86Tl0BB8VZ9tI',
-      stockState: 'in',
-      stockRemaining: '10 kg remaining',
-      category: 'Isda & Latag',
-      tag: 'New Latag',
-    };
+  if (!newItemName.trim()) return;
+
+  const newProd: Product = {
+    id: `prod-manual-${Date.now()}`,
+    createdAt: '02/12/26',
+    updatedAt: '02/24/26',
+    name: newItemName.trim(),
+    price: Math.max(0, parseFloat(newItemPrice) || 100),
+    unit: newItemUnit,
+    vendorID: 'Ate Lorna',
+    image:
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBH3Mep5a4WK5TVh_QaWmTDKNZ6ydSZNwY8uFZuwPyLGHD3byy5HwUkSJAbV8_l5FD4HA6JR0Ewv_lcc2GVT-0jKmyFl4yFrNNDe5HAXaQSXUNevOqNwGr2OaXohmZQq0wL8QubCTiUDFa30S6AM_PkOJzl2qP2ZO7kyFoWwTPP9Eb5Rp36HQtkfqzhvoQl0Gd-PBFnlebsvX2DLi-8WtbZ45NKnmBcQYF17Jf2mrF86Tl0BB8VZ9tI',
+    stockState: 'in_stock',
+    stockRemaining: '10 kg remaining',
+    subtitle: `${newItemName.trim()} from Ate Lorna`,
+    unitText: `per ${newItemUnit}`,
+    category: 'Seafood',
+    tag: 'New Latag',
+    quantity: 1,
+    minQuantity: 1,
+    step: 1,
+    reviewCount: 0,
+  };
 
     onAddProduct(newProd);
     setNewItemName('');
+    setNewItemPrice('180');
+    setNewItemUnit('kilo');
     setShowAddItemModal(false);
     setHandoverToast('Bag-ong produkto napublish!');
+
     setTimeout(() => setHandoverToast(null), 2500);
   };
 
+  const driverMap = new Map(
+    drivers.map(driver => [driver.id, driver.name])
+  );
+
   const ateLornaProducts = products.filter(
-    (p) => p.vendorId === 'vendor-lorna' || p.stall.includes('Stall #42')
+    (p) => p.vendorID === 'vendor-lorna'
   );
 
   const activeOrders = orders.filter(
@@ -328,7 +351,6 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
                   </span>
                 </div>
                 <button
-                  onClick={handlePublishVoiceItem}
                   className="px-3 py-1 bg-[#226b47] hover:bg-[#004328] text-white rounded-lg text-[11px] font-bold shrink-0 ml-2 shadow-xs"
                 >
                   Publish
@@ -401,7 +423,7 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
                       </span>
                     </div>
                     <span className="text-[11px] text-[#707971] line-clamp-1">
-                      Suki Buyer: {order.customerName}
+                      Suki Buyer: {order.customerId}
                     </span>
                   </div>
                 </div>
@@ -414,7 +436,11 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
               <div className="p-2.5 bg-[#edf6ec] rounded-xl text-[#161d18] space-y-1">
                 <div className="flex items-center justify-between text-[12px]">
                   <span className="font-bold">
-                    • {order.items[0]?.quantity || 1} {order.items[0]?.product.unit || 'kg'} {order.items[0]?.product.name}
+                    {/* • {findOrderCartItems(order,mockCartItems)[0]?.quantity || 1} {
+
+                    findOrderCartItems(order,mockCartItems)[0]?. || 'kg'} {
+
+                      order.items[0]?.productName} */}
                   </span>
                   {order.specialInstructions && (
                     <span className="text-[#711700] font-bold text-[11px] truncate max-w-[180px]">
@@ -427,10 +453,10 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
                     <span className="material-symbols-outlined text-[15px] text-[#226b47]">
                       electric_rickshaw
                     </span>
-                    {order.driver.name} arriving in{' '}
-                    <strong className="text-[#226b47]">
+                    {order.driverId} arriving in{' '}
+                    {/* <strong className="text-[#226b47]">
                       {order.driver.etaMinutes} mins
-                    </strong>
+                    </strong> */}
                   </span>
                   <span className="text-[10px] text-[#707971]">
                     {order.paymentMethod}
@@ -445,7 +471,10 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
                     onClick={() => {
                       onUpdateOrderStatus(order.id, 'delivering');
                       setHandoverToast(
-                        `Nahatag na ang Order #${order.id} kang ${order.driver.name}!`
+                        // `Nahatag na ang Order #${order.id} kang ${order.driver.name}!`
+                        `Nahatag na ang Order #${order.id} kang ${
+                          drivers.find(driver => driver.id === order.driverId)?.name ?? "Unassigned"
+                        }!`
                       );
                       setTimeout(() => setHandoverToast(null), 2500);
                     }}
@@ -454,14 +483,18 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
                     <span className="material-symbols-outlined text-[18px]">
                       handshake
                     </span>
-                    <span>Hand Over to {order.driver.name.split(' ')[1] || 'Driver'}</span>
+                    <span>
+                      {/* Hand Over to {order.driver.name.split(' ')[1] || 'Driver'} */}
+                      Hand Over to {drivers.find(driver => driver.id === order.driverId)?.name.split(' ')[1] || 'Driver'}
+                      
+                    </span>
                   </button>
                 ) : order.status === 'delivering' ? (
                   <div className="flex-1 h-10 bg-[#e8f0e7] text-[#004328] rounded-xl text-[12px] font-bold flex items-center justify-center gap-1.5">
                     <span className="material-symbols-outlined text-[18px]">
                       check_circle
                     </span>
-                    <span>Dispatched via {order.driver.name}</span>
+                    <span>Dispatched via {drivers.find(driver => driver.id === order.driverId)?.name}</span>
                   </div>
                 ) : (
                   <button
@@ -484,7 +517,7 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
                 <button
                   aria-label="Call Driver"
                   onClick={() => {
-                    setHandoverToast(`Gitawag si ${order.driver.name} (${order.driver.phone})...`);
+                    setHandoverToast(`Gitawag si ${drivers.find(driver => driver.id === order.driverId)?.name} (${drivers.find(driver => driver.id === order.driverId)?.phone})...`);
                     setTimeout(() => setHandoverToast(null), 2500);
                   }}
                   className="h-10 px-3 bg-[#edf6ec] hover:bg-[#e2ebe1] text-[#161d18] rounded-xl flex items-center justify-center gap-1 active:scale-95 transition-all"
@@ -525,7 +558,7 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
               <div className="flex items-center gap-2.5 min-w-0">
                 <img
                   className={`w-12 h-12 rounded-lg object-cover ${
-                    prod.stockState === 'sold' ? 'grayscale opacity-60' : ''
+                    prod.stockState === 'out_of_stock' ? 'grayscale opacity-60' : ''
                   }`}
                   alt={prod.name}
                   src={prod.image}
@@ -544,26 +577,26 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
               <button
                 onClick={() => onToggleStock(prod.id)}
                 className={`px-3 py-1.5 rounded-full text-[10px] font-extrabold flex items-center gap-1 transition-all shrink-0 active:scale-95 shadow-xs ${
-                  prod.stockState === 'in'
+                  prod.stockState === 'in_stock'
                     ? 'bg-[#226b47] text-white'
-                    : prod.stockState === 'low'
+                    : prod.stockState === 'low_stock'
                     ? 'bg-[#febb2d] text-[#271900]'
                     : 'bg-[#dce5db] text-[#404942]'
                 }`}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
-                    prod.stockState === 'in'
+                    prod.stockState === 'in_stock'
                       ? 'bg-white'
-                      : prod.stockState === 'low'
+                      : prod.stockState === 'low_stock'
                       ? 'bg-[#7d5800]'
                       : 'bg-[#707971]'
                   }`}
                 ></span>
                 <span>
-                  {prod.stockState === 'in'
+                  {prod.stockState === 'in_stock'
                     ? 'IN STOCK'
-                    : prod.stockState === 'low'
+                    : prod.stockState === 'low_stock'
                     ? 'LOW STOCK'
                     : 'SOLD OUT'}
                 </span>
@@ -629,7 +662,7 @@ export const TinderaHubScreen: React.FC<TinderaHubScreenProps> = ({
             <form onSubmit={handleAddNewManualItem} className="space-y-3">
               <div>
                 <label className="text-[11px] font-bold text-[#707971] block mb-1">
-                  Ngalan sa Isda / Item
+                  Ngalan sa Item
                 </label>
                 <input
                   type="text"

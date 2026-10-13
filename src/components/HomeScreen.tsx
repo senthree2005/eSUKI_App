@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Product, LiveVendor, StreetFoodVendor } from '../types';
+import { Product,LiveVendor,Vendor, Customer } from '../types';
+import { findVendorById, findVendorsByCustomerId } from '../data/mockDataTest';
 
 interface HomeScreenProps {
   products: Product[];
   liveVendors: LiveVendor[];
-  streetFoodVendors: StreetFoodVendor[];
   onOpenLiveStream: (vendorId?: string) => void;
+  onSelectTab: (tab: string) => void;
+  onSelectProduct: (product: Product) => void;
   onAddToCart: (product: Product, quantity?: number, note?: string) => void;
   searchQuery: string;
 }
@@ -13,8 +15,9 @@ interface HomeScreenProps {
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   products,
   liveVendors,
-  streetFoodVendors,
   onOpenLiveStream,
+  onSelectProduct,
+  onSelectTab,
   onAddToCart,
   searchQuery,
 }) => {
@@ -40,13 +43,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     }, 1200);
   };
 
+
+
+
   // Filter products based on search or category
   const filteredProducts = products.filter((p) => {
+    const vendor = findVendorById(p.vendorID);
     const matchesSearch =
       searchQuery.trim() === '' ||
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.localName && p.localName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      p.vendorName.toLowerCase().includes(searchQuery.toLowerCase());
+      vendor?.name.toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesCategory =
       selectedCategory === 'All' || p.category === selectedCategory;
@@ -143,7 +150,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             >
               <div
                 className={`relative p-0.5 rounded-full shadow-sm group-active:scale-95 transition-transform ${
-                  vendor.isLive
+                  findVendorById(vendor.vendorId)?.isLive
                     ? 'bg-gradient-to-tr from-[#9a2300] via-[#febb2d] to-[#9a2300]'
                     : 'bg-[#dce5db]'
                 }`}
@@ -151,16 +158,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 <div className="w-16 h-16 rounded-full overflow-hidden p-0.5 bg-[#f3fcf2]">
                   <img
                     className="w-full h-full object-cover rounded-full"
-                    alt={vendor.name}
+                    alt={findVendorById(vendor.vendorId)?.name}
                     src={vendor.avatar || vendor.image}
                   />
                 </div>
                 <span
                   className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 text-white font-extrabold text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-0.5 shadow-sm ${
-                    vendor.isLive ? 'bg-[#9a2300]' : 'bg-[#004328]'
+                    findVendorById(vendor.vendorId)?.isLive ? 'bg-[#9a2300]' : 'bg-[#004328]'
                   }`}
                 >
-                  {vendor.isLive ? (
+                  {findVendorById(vendor.vendorId)?.isLive ? (
                     <>
                       <span className="material-symbols-outlined text-[10px]">sensors</span>
                       {vendor.viewers}
@@ -171,7 +178,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </span>
               </div>
               <span className="text-[12px] font-bold text-[#161d18] mt-2 truncate w-20">
-                {vendor.name}
+                {findVendorById(vendor.vendorId)?.name}
               </span>
               <span className="text-[10px] text-[#404942] truncate w-20">
                 {vendor.category}
@@ -360,16 +367,24 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </div>
 
         <div className="flex overflow-x-auto no-scrollbar gap-3 px-4 snap-x snap-mandatory">
-          {streetFoodVendors.map((vendor) => (
+          {products.filter((product)=> product.category === 'Street Food')
+          .map((product) => 
+          {
+            const vendor = findVendorById(product.vendorID)
+          return (
             <div
-              key={vendor.id}
+              key={product.id}
+              onClick={()=>{
+                  onSelectProduct(product)
+                  onSelectTab('item')
+                }}
               className="snap-start flex flex-col w-40 shrink-0 rounded-xl overflow-hidden bg-white shadow-[0_2px_8px_rgba(13,92,58,0.08)] border border-[#e2ebe1]"
             >
               <div className="relative h-28 w-full bg-[#edf6ec]">
                 <img
                   className="w-full h-full object-cover"
-                  alt={vendor.name}
-                  src={vendor.image}
+                  alt={product.name}
+                  src={product.image}
                 />
                 <div className="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur-xs px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
                   <span
@@ -377,40 +392,29 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   >
                     star
                   </span>
-                  <span className="text-[10px] font-bold text-[#161d18]">{vendor.rating}</span>
+                  <span className="text-[10px] font-bold text-[#161d18]">{vendor?.rating}</span>
                 </div>
               </div>
 
               <div className="p-2.5 flex flex-col justify-between flex-1">
                 <div>
                   <h4 className="text-[13px] font-bold text-[#161d18] truncate">
-                    {vendor.name}
+                    {product.name}
                   </h4>
                   <span className="text-[10px] text-[#404942] block mt-0.5">
-                    {vendor.distance} • {vendor.location}
+                    {/* {vendor.distance} • {vendor.location} */}
+                    {vendor?.location}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between mt-2 pt-1">
                   <span className="text-[12px] font-extrabold text-[#004328]">
-                    from ₱{vendor.minPrice}
+                    from ₱{product.price}
                   </span>
                   <button
-                    onClick={() => {
-                      const sfProduct: Product = {
-                        id: `sf-${vendor.id}`,
-                        name: `${vendor.name} Special`,
-                        price: vendor.minPrice,
-                        unit: 'order',
-                        stall: vendor.location,
-                        vendor: vendor,
-                        vendorId: vendor.id,
-                        image: vendor.image,
-                        stockState: 'in',
-                        category: 'Street Food',
-                        reviewCount: 0
-                      };
-                      handleAddSukiWithFeedback(sfProduct);
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleAddSukiWithFeedback(product);
                     }}
                     className="w-6 h-6 rounded-full bg-[#a9f3c5] flex items-center justify-center text-[#002111] hover:bg-[#004328] hover:text-white transition-colors active:scale-95"
                   >
@@ -419,7 +423,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </div>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       </section>
 
@@ -436,10 +440,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* 2-Column Product Grid */}
         <div className="grid grid-cols-2 gap-2.5">
           {filteredProducts
-            .filter((p) => p.category === 'Fresh Gulay' || p.category === 'Isda & Latag')
-            .map((item) => (
+            // .filter((p) => p.category === 'Vegetable' || p.category === 'Seafood' || p.category ==='')
+            .map((item) =>
+              {
+                const vendor = findVendorById(item.vendorID)
+              return (
               <div
                 key={item.id}
+                onClick={()=>{
+                  onSelectProduct(item)
+                  onSelectTab('item')
+                }}
                 className="flex flex-col rounded-xl overflow-hidden bg-white shadow-[0_2px_8px_rgba(13,92,58,0.06)] border border-[#e2ebe1] p-2"
               >
                 <div className="relative w-full h-32 rounded-lg overflow-hidden bg-[#edf6ec]">
@@ -463,7 +474,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
                 <div className="pt-2 flex flex-col flex-1 justify-between">
                   <div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-start gap-1">
                       <span className="text-[16px] font-extrabold text-[#004328]">
                         ₱{item.price}
                       </span>
@@ -476,12 +487,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       <span className="material-symbols-outlined text-[12px] text-[#004328]">
                         storefront
                       </span>
-                      <span className="text-[10px] truncate">{item.stall}</span>
+                      <span className="text-[10px] truncate">{vendor?.name} •<br></br> {vendor?.location}</span>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => handleAddSukiWithFeedback(item)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleAddSukiWithFeedback(item)}}
                     className={`mt-2.5 w-full py-1.5 rounded-lg text-[12px] font-bold transition-all flex items-center justify-center gap-1 active:scale-95 ${
                       addedItemFeedback[item.id]
                         ? 'bg-[#004328] text-white'
@@ -506,7 +519,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </button>
                 </div>
               </div>
-            ))}
+            )})}
         </div>
       </section>
 

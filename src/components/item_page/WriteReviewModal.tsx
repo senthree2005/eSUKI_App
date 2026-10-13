@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { X, Star, Sparkles } from 'lucide-react';
+import { findProductById, findVendorById } from '../../data/mockDataTest';
 import { Review } from '../../types';
 
 interface WriteReviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmitReview: (review: Review) => void;
-  productName: string;
+  productID: string;
 }
 
 export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
   isOpen,
   onClose,
   onSubmitReview,
-  productName,
+  productID,
 }) => {
   const [author, setAuthor] = useState('Nanay Corazon');
   const [location, setLocation] = useState('Magugpo East, Tagum');
@@ -24,30 +25,50 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
   const [comment, setComment] = useState('');
   const [selectedCut, setSelectedCut] = useState('Ordered Hawanon & Daing Cut');
 
-  if (!isOpen) return null;
+  const product = findProductById(productID)
+  if (!isOpen || !product) return null;
+
+  const vendor = findVendorById(product.vendorID)
+  if(!vendor) return null;
+
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!comment.trim()) return;
 
-    const newRev: Review = {
-      id: `rev-${Date.now()}`,
-      author: author || 'Palengke Suki',
-      tier: 'Suki Tier 3',
-      location: location || 'Tagum City',
-      timestamp: 'Just now',
-      rating,
-      comment: `“${comment.trim()}”`,
-      prepTag: selectedCut,
+    const newRev: Review = { // change this Later
+      id: 'rev-${Date.now()',
+      productId: productID,
+      customerId: author,
+      vendorId: vendor?.id,
+      rating: rating,
+      comment: '${comment.trim()}',
+      location: vendor.location,
+      tier: 'Diamond Suki', //Change This Later
+      prepTag: "Cleaned",
       verifiedSuki: true,
-      avatarColor: 'bg-[#bbf7d0] text-[#14532d]',
-      initials: (author || 'PS')
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .slice(0, 2)
-        .toUpperCase(),
-    };
+      avatarColor: "#D9EAD3",
+      initials: "NA",
+      updatedAt: "Just Now", //change this later
+      createdAt: "Just Now" //change this later
+    }
+    // const newRev: Review = {
+    //   id: `rev-${Date.now()}`,
+    //   location: location || 'Tagum City',
+    //   timestamp: 'Just now',
+    //   rating,
+    //   comment: `“${comment.trim()}”`,
+    //   prepTag: selectedCut,
+    //   verifiedSuki: true,
+    //   avatarColor: 'bg-[#bbf7d0] text-[#14532d]',
+    //   initials: (author || 'PS')
+    //     .split(' ')
+    //     .map((n) => n[0])
+    //     .join('')
+    //     .slice(0, 2)
+    //     .toUpperCase(),
+    // };
 
     onSubmitReview(newRev);
     onClose();
@@ -73,7 +94,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
         <form onSubmit={handleSubmit} className="p-5 space-y-4 text-xs">
           <div>
             <label className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block mb-1">
-              Rating for {productName}
+              Rating for {product.name}
             </label>
             <div className="flex gap-1.5">
               {[1, 2, 3, 4, 5].map((star) => (

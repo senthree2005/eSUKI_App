@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Send, Clock, Sparkles } from 'lucide-react';
-import { ateLornaImg } from '../../data/mockDataItems';
+// import { ateLornaImg } from '../../data/mockDataTest';
+import { Vendor } from '../../types';
 
 interface ChatMessage {
   id: string;
@@ -12,15 +13,17 @@ interface ChatMessage {
 interface ChatWithVendorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  vendorName?: string;
-  stallName?: string;
+  // vendorName?: string;
+  // stallName?: string;
+  vendor: Vendor
 }
 
 export const ChatWithVendorModal: React.FC<ChatWithVendorModalProps> = ({
   isOpen,
   onClose,
-  vendorName = 'Ate Lorna Capulong',
-  stallName = "Ate Lorna's Fish Stall",
+  vendor
+  // vendorName = 'Ate Lorna Capulong',
+  // stallName = "Ate Lorna's Fish Stall",
 }) => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -97,15 +100,15 @@ export const ChatWithVendorModal: React.FC<ChatWithVendorModalProps> = ({
           <div className="flex items-center gap-3">
             <div className="relative">
               <img
-                src={ateLornaImg}
-                alt={vendorName}
+                src={vendor.avatarUrl}
+                alt={vendor.name}
                 className="w-11 h-11 rounded-lg object-cover border-2 border-white/60"
               />
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-[#0d5c3a] rounded-full" />
             </div>
             <div>
-              <h3 className="font-bold text-sm leading-tight">{stallName}</h3>
-              <p className="text-xs text-emerald-200">{vendorName} • Wet Stall #14</p>
+              <h3 className="font-bold text-sm leading-tight">{vendor.location}</h3>
+              <p className="text-xs text-emerald-200">{vendor.name} • Wet Stall #14</p>
               <div className="flex items-center gap-1 text-[11px] text-emerald-100/90 mt-0.5">
                 <Clock className="w-3 h-3 text-amber-300" />
                 <span>Replies in &lt; 2 mins • Active Now</span>

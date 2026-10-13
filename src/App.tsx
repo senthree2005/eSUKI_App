@@ -4,14 +4,17 @@
  */
 
 import React, { act, useState } from 'react';
-import { Product, LiveVendor, CartItem, Order, SukiCustomer } from './types';
+import { Product, LiveVendor, CartItem, Order, SukiCustomer, Customer,Driver, Vendor } from './types';
 import {
-  INITIAL_PRODUCTS,
-  LIVE_VENDORS,
-  STREET_FOOD_VENDORS,
-  INITIAL_ORDERS,
-  INITIAL_SUKI_CUSTOMERS,
-} from './data/mockData';
+  mockProducts,
+  mockLiveVendors,
+  mockOrders,
+  mockDrivers,
+  mockVendors,
+  mockCartItems,
+  mockSukiCustomers,
+  mockCustomers,
+} from './data/mockDataTest';
 import { Header } from './components/Header';
 import { BottomNav } from './components/BottomNav';
 import { CartModal } from './components/CartModal';
@@ -22,22 +25,27 @@ import { OrdersScreen } from './components/OrdersScreen';
 import { SukiListahanScreen } from './components/SukiListahanScreen';
 import { AuthScreen } from './components/Authentication';
 import  {AccountUser}  from './components/user_page/AccountUser'
+import { ItemDetails } from './components/item_page/ItemDetails';
 
 export default function App() {
   // const [activeTab, setActiveTab] = useState<string>('home');
   // const [previousTab, setPreviousTab] = useState<string>('home');
-  const [activeTab, setActiveTab] = useState<string>('auth');
-  const [previousTab, setPreviousTab] = useState<string>('auth');
+  const [activeTab, setActiveTab] = useState<string>('home');
+  const [previousTab, setPreviousTab] = useState<string>('home');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedProduct, setSelectedProduct] = useState<Product>();
 
   // Core App Data Stores
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [liveVendors, setLiveVendors] = useState<LiveVendor[]>(LIVE_VENDORS);
+  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const [customers, setCustomer] = useState<Customer[]>(mockCustomers);
+  const [liveVendors, setLiveVendors] = useState<LiveVendor[]>(mockLiveVendors);
+  const [vendors, setVendors] = useState<Vendor[]>(mockVendors);
+  const [drivers, setDrivers] = useState<Driver[]>(mockDrivers);
   const [selectedLiveVendorId, setSelectedLiveVendorId] = useState<string>('vendor-lorna');
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(mockCartItems);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
-  const [sukiCustomers, setSukiCustomers] = useState<SukiCustomer[]>(INITIAL_SUKI_CUSTOMERS);
+  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const [sukiCustomers, setSukiCustomers] = useState<SukiCustomer[]>(mockSukiCustomers);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState<{ name: string; phone: string; method: string } | null>(null);
 
@@ -49,18 +57,43 @@ export default function App() {
     setActiveTab('home');
   };
 
+  const findCartProduct = (productId: string): Product | undefined => {
+    return products.find((product) => product.id === productId);
+  };
+  const findCustomer = (customerId: string): Customer | undefined => {
+    return customers.find((customer) => customer.id === customerId);
+  };
+
   // Cart operations
   const handleAddToCart = (product: Product, quantity = 1, note = '') => {
     setCartItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
+      const existing = prev.find((item) => item.productId === product.id);
+    
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+          item.productId === product.id
+            ? {
+                ...item,
+                quantity: item.quantity + quantity,
+                note: note || item.note,
+                updatedAt: new Date().toISOString(),
+              }
             : item
         );
       }
-      return [...prev, { product, quantity, note }];
+    
+      return [
+        ...prev,
+        {
+          id: `${Math.floor(1044 + Math.random() * 900)}`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          customerId: customers[0].id,
+          productId: product.id,
+          quantity,
+          note,
+        },
+      ];
     });
   };
 
@@ -68,7 +101,7 @@ export default function App() {
     setCartItems((prev) =>
       prev
         .map((item) => {
-          if (item.product.id === productId) {
+          if (item.productId === productId) {
             const newQty = item.quantity + delta;
             return newQty > 0 ? { ...item, quantity: newQty } : null;
           }
@@ -79,7 +112,7 @@ export default function App() {
   };
 
   const handleRemoveCartItem = (productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
+    setCartItems((prev) => prev.filter((item) => item.productId !== productId));
   };
 
   // Instant Checkout & Order creation
@@ -91,7 +124,7 @@ export default function App() {
     if (cartItems.length === 0) return;
 
     const subtotal = cartItems.reduce(
-      (sum, item) => sum + item.product.price * item.quantity,
+      (sum, item) => sum + (findCartProduct(item.productId)?.price ?? 0) * item.quantity,
       0
     );
     const deliveryFee = subtotal >= 250 ? 0 : 30;
@@ -100,20 +133,16 @@ export default function App() {
 
     const newOrder: Order = {
       id: `${Math.floor(1044 + Math.random() * 900)}`,
-      customerName: 'You (Suki Buyer)',
+      customerId: '#124532',
       customerAddress: orderData.address,
-      items: [...cartItems],
+      orders: [...cartItems],
       totalPrice: total,
       status: 'preparing',
-      driver: {
-        name: 'Tricycle Junjun',
-        vehicle: 'Kawasaki Barako Sidecar (Plate #TM-429)',
-        etaMinutes: 12,
-        phone: '0917-882-4412',
-      },
+      driverId: '#42141',
       specialInstructions: orderData.note,
       paymentMethod: orderData.paymentMethod,
       createdAt: 'Just now',
+      updatedAt: 'Just now'
     };
 
     setOrders((prev) => [newOrder, ...prev]);
@@ -126,23 +155,28 @@ export default function App() {
     const deliveryFee = subtotal >= 250 ? 0 : 30;
     const discount = 20; // ₱20 live voucher
     const total = Math.max(0, subtotal + deliveryFee - discount);
-
+    const customers_id = customers[0].id;
+    const product_id = product.id;
     const newOrder: Order = {
       id: `${Math.floor(1044 + Math.random() * 900)}`,
-      customerName: 'You (Live Suki)',
+      customerId: '#2344',
       customerAddress: 'Tagum Center, Purok 4 Magugpo Poblacion',
-      items: [{ product, quantity, note }],
+      orders: [{
+        id: `${Date.now()}`,
+        customerId: customers[0].id,
+        productId: product.id,
+        quantity,
+        note,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },],
       totalPrice: total,
       status: 'preparing',
-      driver: {
-        name: 'Tricycle Junjun',
-        vehicle: 'Kawasaki Barako Sidecar (Plate #TM-429)',
-        etaMinutes: 10,
-        phone: '0917-882-4412',
-      },
+      driverId: '#432',
       specialInstructions: note,
       paymentMethod: 'COD',
       createdAt: 'Just now',
+      updatedAt: 'Just now',
     };
 
     setOrders((prev) => [newOrder, ...prev]);
@@ -162,18 +196,18 @@ export default function App() {
       prev.map((prod) => {
         if (prod.id === productId) {
           const nextState =
-            prod.stockState === 'in'
-              ? 'low'
-              : prod.stockState === 'low'
-              ? 'sold'
-              : 'in';
+            prod.stockState === 'in_stock'
+              ? 'low_stock'
+              : prod.stockState === 'low_stock'
+              ? 'out_of_stock'
+              : 'in_stock';
           return {
             ...prod,
             stockState: nextState,
             stockRemaining:
-              nextState === 'in'
+              nextState === 'in_stock'
                 ? '8 kg remaining'
-                : nextState === 'low'
+                : nextState === 'low_stock'
                 ? '2 kg remaining'
                 : 'Sold out for today',
           };
@@ -216,10 +250,11 @@ export default function App() {
     (o) => o.status === 'preparing' || o.status === 'ready'
   ).length;
 
+  console.log(activeTab + " " + selectedProduct?.id)
   return (
     <div className="min-h-screen bg-[#f3fcf2] text-[#161d18] flex flex-col antialiased">
       {/* Show Standard Palengke Header on tabs other than full-screen Live broadcast */}
-      {activeTab === 'home' && (
+      {(activeTab === 'home' || activeTab === 'item') && (
         <Header
           onOpenCart={() => setIsCartOpen(true)}
           cartCount={totalCartCount}
@@ -246,10 +281,22 @@ export default function App() {
           <HomeScreen
             products={products}
             liveVendors={liveVendors}
-            streetFoodVendors={STREET_FOOD_VENDORS}
             onOpenLiveStream={handleOpenLiveStream}
+            onSelectProduct={setSelectedProduct}
+            onSelectTab={(tab) => {
+              setPreviousTab(activeTab);
+              setActiveTab(tab);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             onAddToCart={handleAddToCart}
             searchQuery={searchQuery}
+          />
+        )}
+        {activeTab === 'item' && selectedProduct && (
+          <ItemDetails
+            product={selectedProduct}
+            onAddToCart={handleAddToCart}
+            onOpenLiveStream={handleOpenLiveStream}
           />
         )}
 
@@ -289,6 +336,7 @@ export default function App() {
           <TinderaHubScreen
             products={products}
             orders={orders}
+            drivers={drivers}
             onStartLiveStream={() => handleOpenLiveStream('vendor-lorna')}
             onOpenNotebook={() => {
               setPreviousTab(activeTab);
@@ -306,9 +354,15 @@ export default function App() {
             orders={orders}
             onOpenLiveStream={() => handleOpenLiveStream('vendor-lorna')}
             onReorder={(order) => {
-              if (order.items[0]) {
-                handleAddToCart(order.items[0].product, order.items[0].quantity);
-                setIsCartOpen(true);
+              const firstItem = order.orders[0];
+
+              if (firstItem) {
+                const product = findCartProduct(firstItem.productId);
+              
+                if (product) {
+                  handleAddToCart(product, firstItem.quantity);
+                  setIsCartOpen(true);
+                }
               }
             }}
           />

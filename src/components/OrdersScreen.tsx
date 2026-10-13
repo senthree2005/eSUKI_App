@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Order } from '../types';
+import React, { useState,useEffect } from 'react';
+import { Driver, Order } from '../types';
+import {findDriverById, findProductById} from '../data/mockDataTest';
 
 interface OrdersScreenProps {
   orders: Order[];
@@ -14,6 +15,7 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const [callToast, setCallToast] = useState<string | null>(null);
+  const [drivers, setDrivers] = useState<Driver>();
 
   const activeOrders = orders.filter(
     (o) => o.status === 'preparing' || o.status === 'ready' || o.status === 'delivering'
@@ -104,6 +106,11 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({
           ) : (
             activeOrders.map((order) => {
               const currentStep = getStepProgress(order.status);
+              useEffect(() => {
+                  if (order.driverId) {
+                      setDrivers(findDriverById(order.driverId));
+                  }
+              }, [order.driverId]);
               return (
                 <div
                   key={order.id}
@@ -202,19 +209,22 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({
 
                   {/* Items List */}
                   <div className="bg-[#edf6ec] p-2.5 rounded-xl space-y-1.5">
-                    {order.items.map((it, idx) => (
+                    {order.orders.map((it, idx) => 
+                    {
+                      const product = findProductById(it.productId)
+                    return (
                       <div
                         key={idx}
                         className="flex items-center justify-between text-[12px]"
                       >
                         <span className="font-bold text-[#161d18]">
-                          {it.quantity} {it.product.unit} {it.product.name}
+                          {it.quantity} {product?.unit} {product?.name}
                         </span>
                         <span className="text-[#004328] font-bold">
-                          ₱{(it.product.price * it.quantity).toFixed(0)}
+                          ₱{((product?.price?? 0) * it.quantity).toFixed(0)}
                         </span>
                       </div>
-                    ))}
+                    )})}
                     {order.specialInstructions && (
                       <p className="text-[11px] text-[#711700] italic pt-1 border-t border-[#bfc9c0]/30">
                         Bilin: “{order.specialInstructions}”
@@ -232,17 +242,18 @@ export const OrdersScreen: React.FC<OrdersScreenProps> = ({
                       </div>
                       <div>
                         <h4 className="font-bold text-[13px] text-[#161d18]">
-                          {order.driver.name}
+                          {drivers?.name}
                         </h4>
                         <span className="text-[10px] text-[#707971] block">
-                          {order.driver.vehicle} • ETA {order.driver.etaMinutes} mins
+                          {drivers?.vehicle}
+                          {/* • ETA {drivers?.etaMinutes} mins */}
                         </span>
                       </div>
                     </div>
 
                     <button
                       onClick={() => {
-                        setCallToast(`Connecting tawag kang ${order.driver.name} (${order.driver.phone})...`);
+                        setCallToast(`Connecting tawag kang ${drivers?.name} (${drivers?.phone})...`);
                         setTimeout(() => setCallToast(null), 2500);
                       }}
                       className="px-3 py-1.5 bg-white hover:bg-[#edf6ec] text-[#004328] border border-[#bfc9c0]/50 rounded-xl text-[11px] font-bold flex items-center gap-1 shadow-xs"

@@ -86,12 +86,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
         {/* Listahan (Suki Notebook) */}
         <button
-          onClick={() => onSelectTab('suki-listahan')}
-          className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-0.5 transition-colors ${
-            activeTab === 'suki-listahan'
-              ? 'text-[#004328] font-bold'
-              : 'text-[#404942] hover:text-[#161d18]'
-          }`}
+          // onClick={() => onSelectTab('suki-listahan')}
+          //className={`flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-0.5 transition-colors ${
+            //activeTab === 'suki-listahan'
+              //? 'text-[#004328] font-bold'
+              //: 'text-[#404942] hover:text-[#161d18]'
+          //}`}
+          className="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] gap-0.5 text-gray-300 transition-colors"
         >
           <span
             className={`material-symbols-outlined text-[22px] ${

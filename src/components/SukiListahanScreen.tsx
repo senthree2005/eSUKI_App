@@ -34,17 +34,20 @@ export const SukiListahanScreen: React.FC<SukiListahanScreenProps> = ({
     e.preventDefault();
     if (!name.trim()) return;
 
+    // const newCustomer: SukiCustomer = {
+    //   id: `suki-${name.trim()}`,
+    //   name: name.trim(),
+    //   phone: phone.trim() || '09xx-xxx-xxxx',
+    //   tier,
+    //   totalOrders: 1,
+    //   totalSpent: 350,
+    //   favoriteItems: ['Fresh Bangus', 'Talong'],
+    //   outstandingBalance: 0,
+    //   lastOrdered: 'Karon lang',
+    //   notes: notes.trim() || 'Bag-ong suki sa Tagum market',
+    // };
     const newCustomer: SukiCustomer = {
-      id: `suki-${Date.now()}`,
-      name: name.trim(),
-      phone: phone.trim() || '09xx-xxx-xxxx',
-      tier,
-      totalOrders: 1,
-      totalSpent: 350,
-      favoriteItems: ['Fresh Bangus', 'Talong'],
-      outstandingBalance: 0,
-      lastOrdered: 'Karon lang',
-      notes: notes.trim() || 'Bag-ong suki sa Tagum market',
+      customerId
     };
 
     onAddSuki(newCustomer);

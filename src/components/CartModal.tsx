@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CartItem } from '../types';
+import { findProductById,findVendorById } from '../data/mockDataTest';
 
 interface CartModalProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ export const CartModal: React.FC<CartModalProps> = ({
   if (!isOpen) return null;
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + (findProductById(item.productId)?.price ?? 0) * item.quantity,
     0
   );
 
@@ -122,27 +123,31 @@ export const CartModal: React.FC<CartModalProps> = ({
                 <span className="text-[11px] font-bold uppercase text-[#707971] tracking-wider">
                   Mga Palaliton ({cartItems.length})
                 </span>
-                {cartItems.map((item) => (
+                {cartItems.map((item) => 
+                {
+                  const product = findProductById(item.productId)
+                  const vendor = findVendorById(product?.vendorID ?? 'undefined')
+                return (
                   <div
-                    key={item.product.id}
+                    key={product?.id}
                     className="bg-white p-3 rounded-xl shadow-xs border border-[#e2ebe1] flex items-center justify-between gap-3"
                   >
                     <img
-                      src={item.product.image}
-                      alt={item.product.name}
+                      src={product?.image}
+                      alt={product?.name}
                       className="w-14 h-14 rounded-lg object-cover bg-[#edf6ec] shrink-0"
                     />
                     <div className="flex-1 min-w-0">
                       <h4 className="font-bold text-[13px] text-[#161d18] truncate">
-                        {item.product.name}
+                        {product?.name}
                       </h4>
                       <div className="text-[11px] text-[#707971] flex items-center gap-1">
-                        <span>₱{item.product.price} / {item.product.unit}</span>
+                        <span>₱{product?.price} / {product?.unit}</span>
                         <span>•</span>
-                        <span className="truncate">{item.product.vendorName}</span>
+                        <span className="truncate">{vendor?.name}</span>
                       </div>
                       <div className="text-[12px] font-extrabold text-[#004328] mt-0.5">
-                        ₱{(item.product.price * item.quantity).toFixed(0)}
+                        ₱{((product?.price ?? 0) * item.quantity).toFixed(0)}
                       </div>
                     </div>
 
@@ -151,9 +156,9 @@ export const CartModal: React.FC<CartModalProps> = ({
                       <button
                         onClick={() => {
                           if (item.quantity <= 1) {
-                            onRemoveItem(item.product.id);
+                            onRemoveItem(product?.id ?? 'null');
                           } else {
-                            onUpdateQuantity(item.product.id, -1);
+                            onUpdateQuantity(product?.id ?? 'null', -1);
                           }
                         }}
                         className="w-6 h-6 rounded bg-white flex items-center justify-center text-[#161d18] shadow-xs active:scale-95"
@@ -166,14 +171,14 @@ export const CartModal: React.FC<CartModalProps> = ({
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => onUpdateQuantity(item.product.id, 1)}
+                        onClick={() => onUpdateQuantity(product?.id ?? 'null', 1)}
                         className="w-6 h-6 rounded bg-white flex items-center justify-center text-[#161d18] shadow-xs active:scale-95"
                       >
                         <span className="material-symbols-outlined text-[15px]">add</span>
                       </button>
                     </div>
                   </div>
-                ))}
+                )})}
               </div>
 
               {/* Delivery Details */}

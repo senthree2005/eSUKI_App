@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LiveVendor, Product, LiveChatMessage } from '../types';
+import { Product, Vendor,LiveVendor,LiveChatMessage } from '../types';
+import { mockLiveChatMessages, findProductById, findVendorById, findUserById } from '../data/mockDataTest';
 
 interface LiveBroadcastScreenProps {
   vendor: LiveVendor;
@@ -28,34 +29,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
   >([]);
 
   // Live chat messages
-  const [chatMessages, setChatMessages] = useState<LiveChatMessage[]>([
-    {
-      id: 'chat-sys-1',
-      sender: 'System',
-      text: 'Junjun bought 1.5kg Talakitok!',
-      isPurchaseNotice: true,
-      timestamp: 'Just now',
-    },
-    {
-      id: 'chat-1',
-      sender: 'Mang Kanor',
-      text: 'Presko pa na ang bangus ate?',
-      timestamp: '1m ago',
-    },
-    {
-      id: 'chat-2',
-      sender: `${vendor.name} (Host)`,
-      text: 'O Mang Kanor! Bag-o lang gi taga gikan baybay sa coastal road!',
-      isHost: true,
-      timestamp: 'Just now',
-    },
-    {
-      id: 'chat-3',
-      sender: 'Maria S.',
-      text: 'Nag-order kog 2kg Ate, paki-limpyo ug pahiwa palihog.',
-      timestamp: 'Just now',
-    },
-  ]);
+  const [chatMessages, setChatMessages] = useState<LiveChatMessage[]>(mockLiveChatMessages);
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
 
@@ -81,53 +55,62 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
 
     const userMsg: LiveChatMessage = {
       id: `chat-user-${Date.now()}`,
-      sender: 'You',
+      senderUserId: 'You', //change this later
+      liveVendorId: 'Ate-lorna',//change this later
       text: chatInput.trim(),
-      isYou: true,
-      timestamp: 'Just now',
+      isHost: false,
+      isPurchaseNotice: false,
+      createdAt: 'Just Now',
+      updatedAt: 'Just Now'
     };
 
     setChatMessages((prev) => [...prev, userMsg]);
     setChatInput('');
 
     // Simulate friendly tindera response after 2 seconds
-    setTimeout(() => {
-      const replies = [
-        `Salamat suki! Kuhaon nako ang kinanindotan para nimo!`,
-        `Presko kaayo na karong buntag, pilii lang dayon!`,
-        `Noted suki! Ako na gi-andam sa timbangan!`,
-      ];
-      const randomReply = replies[Math.floor(Math.random() * replies.length)];
+    // setTimeout(() => {
+    //   const replies = [
+    //     `Salamat suki! Kuhaon nako ang kinanindotan para nimo!`,
+    //     `Presko kaayo na karong buntag, pilii lang dayon!`,
+    //     `Noted suki! Ako na gi-andam sa timbangan!`,
+    //   ];
+    //   const randomReply = replies[Math.floor(Math.random() * replies.length)];
 
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          id: `chat-reply-${Date.now()}`,
-          sender: `${vendor.name} (Host)`,
-          text: randomReply,
-          isHost: true,
-          timestamp: 'Just now',
-        },
-      ]);
-    }, 1800);
+    //   setChatMessages((prev) => [
+    //     ...prev,
+    //     {
+    //       id: `chat-reply-${Date.now()}`,
+    //       sender: `${vendor.name} (Host)`,
+    //       text: randomReply,
+    //       isHost: true,
+    //       timestamp: 'Just now',
+    //     },
+    //   ]);
+    // }, 1800);
   };
 
   const handleBuyNow = () => {
     triggerHeart();
     triggerHeart();
-
-    onQuickOrder(vendor.pinnedProduct, kiloCount, 'Free gutting & scaling');
-    setShowOrderToast(true);
+    const pinnedProduct = findProductById(vendor.pinnedProductId)
+    if(pinnedProduct) {
+      onQuickOrder(pinnedProduct, kiloCount, 'Free gutting & scaling');
+      setShowOrderToast(true);
+    }
+    
 
     // Also push a purchase celebration into live chat
     setChatMessages((prev) => [
       ...prev,
       {
         id: `chat-sys-${Date.now()}`,
-        sender: 'System',
-        text: `You ordered ${kiloCount}kg ${vendor.pinnedProduct.name}!`,
+        senderUserId: 'System', //change this later
+        liveVendorId: 'live-lorna',
+        text: `You ordered ${kiloCount}kg ${pinnedProduct?.name}!`,
+        isHost:false,
         isPurchaseNotice: true,
-        timestamp: 'Just now',
+        createdAt: 'Just now',
+        updatedAt: 'Just now',
       },
     ]);
 
@@ -136,38 +119,12 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
     }, 4000);
   };
 
+  const liveVendor = findVendorById(vendor.vendorId)
+  const product = findProductById(vendor.pinnedProductId)
+
+
   return (
     <div className="flex flex-col w-full h-screen relative bg-[#161d18] text-white">
-      {/* Top Navigation Bar */}
-      {/* <div className="fixed top-0 w-full z-50 pt-safe bg-[#f3fcf2]/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-[#e2ebe1] text-[#161d18]">
-        <div className="h-16 px-4 flex items-center justify-between max-w-lg mx-auto">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onBack}
-              className="w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-[#161d18] hover:bg-[#e8f0e7] transition-colors"
-            >
-              <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-            </button>
-            <h1 className="font-bold text-[17px] text-[#161d18] line-clamp-1">
-              Live Broadcast Room
-            </h1>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => {
-                setShowShareToast(true);
-                setTimeout(() => setShowShareToast(false), 2000);
-              }}
-              className="w-10 h-10 rounded-full flex items-center justify-center text-[#404942] hover:text-[#161d18] hover:bg-[#e8f0e7] transition-colors"
-            >
-              <span className="material-symbols-outlined text-[22px]">share</span>
-            </button>
-            <div className="w-8 h-8 rounded-full bg-[#004328] flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-[18px]">person</span>
-            </div>
-          </div>
-        </div>
-      </div> */}
 
       {/* Main Broadcast Container */}
       <main className="flex flex-wrap relative w-full h-full  bg-[#161d18] flex-1 max-w-lg min-h-dvh mx-auto">
@@ -190,7 +147,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
               <div className="relative w-9 h-9 rounded-full overflow-hidden bg-[#004328] shrink-0 ring-1 ring-white/20">
                 <img
                   className="w-full h-full object-cover"
-                  alt={vendor.name}
+                  alt={liveVendor?.name}
                   src={vendor.avatar || vendor.image}
                 />
                 <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#8ed6aa] rounded-full ring-1 ring-white"></span>
@@ -198,14 +155,14 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
               <div className="flex flex-col min-w-0 pr-1">
                 <div className="flex items-center gap-1">
                   <span className="font-bold text-[13px] text-white truncate max-w-[90px]">
-                    {vendor.name}
+                    {liveVendor?.name}
                   </span>
                   <span className="material-symbols-outlined text-[14px] text-[#febb2d] shrink-0 material-symbols-fill">
                     verified
                   </span>
                 </div>
                 <span className="text-[10px] text-white/80 truncate">
-                  {vendor.stall}
+                  {liveVendor?.location}
                 </span>
               </div>
               <button
@@ -345,6 +302,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
             {/* Live Chat Bubble Stack */}
             <div className="flex flex-col justify-end gap-1.5 max-w-[76%] max-h-36 overflow-y-auto no-scrollbar">
               {chatMessages.map((msg) => {
+                const user = findUserById(msg.senderUserId)
                 if (msg.isPurchaseNotice) {
                   return (
                     <div
@@ -368,7 +326,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
                       className="bg-[#0d5c3a]/90 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-left shadow-sm border-l-2 border-[#a9f3c5]"
                     >
                       <span className="text-[10px] text-[#a9f3c5] font-bold block">
-                        {msg.sender}:
+                        {user?.username}:
                       </span>
                       <span className="text-[12px] text-white">
                         {msg.text}
@@ -383,7 +341,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
                     className="bg-black/55 backdrop-blur-md text-white px-2.5 py-1 rounded-lg text-left shadow-sm border border-white/10"
                   >
                     <span className="text-[10px] text-[#febb2d] font-bold">
-                      {msg.sender}:
+                      You:
                     </span>
                     <span className="text-[12px] ml-1 text-white/95">
                       {msg.text}
@@ -402,8 +360,8 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
                 <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-[#edf6ec]">
                   <img
                     className="w-full h-full object-cover"
-                    alt={vendor.pinnedProduct.name}
-                    src={vendor.pinnedProduct.image}
+                    alt={product?.name}
+                    src={product?.image}
                   />
                   <div className="absolute top-0 left-0 bg-[#9a2300] text-white text-[9px] font-extrabold px-1 py-0.5 rounded-br">
                     Stall Pin
@@ -414,7 +372,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
                 <div className="flex flex-col min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-1">
                     <h2 className="font-bold text-[14px] text-[#161d18] truncate leading-tight">
-                      {vendor.pinnedProduct.name}
+                      {product?.name}
                     </h2>
                     <span className="text-[10px] font-bold text-[#226b47] bg-[#edf6ec] px-1.5 py-0.5 rounded shrink-0">
                       Live Special
@@ -425,13 +383,13 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
                   </p>
                   <div className="flex items-baseline gap-1 mt-0.5">
                     <span className="text-[18px] font-extrabold text-[#004328]">
-                      ₱{vendor.pinnedProduct.price}
+                      ₱{product?.price}
                     </span>
         
                     <span className="text-[11px] text-[#707971]">/ kg</span>
-                    {vendor.pinnedProduct.originalPrice && (
+                    {product?.originalPrice && (
                       <span className="text-[11px] line-through text-[#707971] ml-1">
-                        ₱{vendor.pinnedProduct.originalPrice}
+                        ₱{product?.originalPrice}
                       </span>
                     )}
                                          
@@ -505,7 +463,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  placeholder={`Pangutana kay ${vendor.name}...`}
+                  placeholder={`Pangutana kay ${liveVendor?.name}...`}
                   className="bg-transparent text-[12px] text-white placeholder:text-white/60 focus:outline-none w-full"
                 />
             
@@ -558,10 +516,10 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
             </div>
             <div className="flex flex-col min-w-0 flex-1">
               <p className="font-bold text-[13px] text-[#a9f3c5]">
-                Order placed with {vendor.name}!
+                Order placed with {liveVendor?.name}!
               </p>
               <p className="text-[11px] text-[#dce5db] truncate">
-                Tricycle Junjun is heading to {vendor.stall}.
+                Tricycle Junjun is heading to {liveVendor?.location}.
               </p>
             </div>
           </div>
@@ -582,7 +540,7 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
             <div className="flex items-center justify-between pb-2 border-b border-[#e2ebe1]">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-[#004328]">storefront</span>
-                <h3 className="font-bold text-[15px]">{vendor.name}'s Fresh Catch Latag</h3>
+                <h3 className="font-bold text-[15px]">{liveVendor?.name}'s Fresh Catch Latag</h3>
               </div>
               <button
                 onClick={() => setShowStallSheet(false)}
@@ -596,21 +554,24 @@ export const LiveBroadcastScreen: React.FC<LiveBroadcastScreenProps> = ({
               <div className="p-2.5 bg-[#edf6ec] rounded-xl flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <img
-                    src={vendor.pinnedProduct.image}
-                    alt={vendor.pinnedProduct.name}
+                    src={product?.image}
+                    alt={product?.name}
                     className="w-12 h-12 rounded-lg object-cover"
                   />
                   <div>
-                    <h4 className="font-bold text-[13px]">{vendor.pinnedProduct.name}</h4>
+                    <h4 className="font-bold text-[13px]">{product?.name}</h4>
                     <span className="text-[11px] text-[#004328] font-extrabold">
-                      ₱{vendor.pinnedProduct.price} / kg
+                      ₱{product?.price} / kg
                     </span>
                   </div>
                 </div>
                 <button
                   onClick={() => {
-                    onAddToCart(vendor.pinnedProduct, 1, 'Live stall order');
-                    setShowStallSheet(false);
+                    if(product) {
+                      onAddToCart(product, 1, 'Live stall order');
+                      setShowStallSheet(false);
+                    }
+                    
                   }}
                   className="px-3 py-1.5 bg-[#004328] text-white rounded-lg text-[11px] font-bold"
                 >
