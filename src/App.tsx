@@ -250,7 +250,44 @@ export default function App() {
     (o) => o.status === 'preparing' || o.status === 'ready'
   ).length;
 
-  console.log(activeTab + " " + selectedProduct?.id)
+
+  // Full Product Update Handler
+  const handleUpdateProduct = (updatedProduct: Product) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+    );
+  };
+
+  // Dedicated Price Editing Handler
+  const handleUpdateProductPrice = (
+    productId: string,
+    newPrice: number,
+    originalPrice?: number,
+    isLiveSpecial?: boolean
+  ) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p.id === productId) {
+          return {
+            ...p,
+            price: newPrice,
+            originalPrice: originalPrice !== undefined ? originalPrice : p.originalPrice,
+            isLiveSpecial: isLiveSpecial !== undefined ? isLiveSpecial : p.isLiveSpecial,
+            updatedAt: new Date().toISOString(),
+          };
+        }
+        return p;
+      })
+    );
+  };
+
+
+
+  // Delete Product Handler
+  const handleDeleteProduct = (productId: string) => {
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
+  };
+
   return (
     <div className="min-h-screen bg-[#f3fcf2] text-[#161d18] flex flex-col antialiased">
       {/* Show Standard Palengke Header on tabs other than full-screen Live broadcast */}
@@ -346,6 +383,9 @@ export default function App() {
             onUpdateOrderStatus={handleUpdateOrderStatus}
             onToggleStock={handleToggleStock}
             onAddProduct={handleAddProduct}
+            onUpdateProductPrice={handleUpdateProductPrice}
+            onUpdateProduct={handleUpdateProduct}
+            onDeleteProduct={handleDeleteProduct}
           />
         )}
 
