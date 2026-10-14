@@ -61,7 +61,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     return matchesSearch && matchesCategory;
   });
 
-  const featuredBangus = products.find((p) => p.id === 'prod-bangus') || products[0];
+  const featuredProduct = products.find((p) => p.id === 'prod-bangus') || products[0];
 
   return (
     <div className="flex flex-col w-full pb-24 space-y-5 max-w-lg mx-auto">
@@ -261,37 +261,44 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </div>
 
           {/* Pinned Live Product Offer (Inside Video Card) */}
-          <div className="bg-white p-3 flex items-center justify-between gap-2 border-t border-[#e2ebe1]">
+          <div
+          onClick={()=>{
+                  onSelectProduct(featuredProduct)
+                  onSelectTab('item')
+                }}
+          className="bg-white p-3 flex items-center justify-between gap-2 border-t border-[#e2ebe1]">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-12 h-12 rounded-lg bg-[#edf6ec] overflow-hidden shrink-0">
                 <img
                   className="w-full h-full object-cover"
-                  alt={featuredBangus.name}
-                  src={featuredBangus.image}
+                  alt={featuredProduct.name}
+                  src={featuredProduct.image}
                 />
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="text-[12px] font-bold text-[#161d18] truncate">
-                  {featuredBangus.name}
+                  {featuredProduct.name}
                 </span>
                 <div className="flex items-baseline gap-1">
                   <span className="text-[16px] font-extrabold text-[#004328]">
-                    ₱{featuredBangus.price}
+                    ₱{featuredProduct.price}
                   </span>
-                  <span className="text-[10px] text-[#404942]">/ {featuredBangus.unit}</span>
+                  <span className="text-[10px] text-[#404942]">/ {featuredProduct.unit}</span>
                 </div>
               </div>
             </div>
 
             <button
-              onClick={() => handleAddSukiWithFeedback(featuredBangus)}
+              onClick={(e) => 
+                {e.stopPropagation()
+                handleAddSukiWithFeedback(featuredProduct)}}
               className={`flex items-center justify-center px-4 py-2 rounded-xl text-[12px] font-bold transition-all active:scale-95 shadow-sm shrink-0 ${
-                addedItemFeedback[featuredBangus.id]
+                addedItemFeedback[featuredProduct.id]
                   ? 'bg-[#004328] text-white'
                   : 'bg-[#febb2d] hover:bg-[#ffdea9] text-[#271900]'
               }`}
             >
-              {addedItemFeedback[featuredBangus.id] ? (
+              {addedItemFeedback[featuredProduct.id] ? (
                 <>
                   <span className="material-symbols-outlined text-[15px] mr-1 animate-spin">
                     check_circle
